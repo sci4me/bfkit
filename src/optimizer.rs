@@ -1,5 +1,7 @@
 use crate::parser::BrainfuckInstruction;
 
+/// Performs up to `max_passes` optimization passes on a sequence of BrainfuckInstructions.
+/// Will stop early, before `max_passes`, if no progress is being made.
 pub fn optimize(ir: Vec<BrainfuckInstruction>, max_passes: u32) -> Vec<BrainfuckInstruction> {
     let opts: Vec<Optimization> = vec![
         contraction,

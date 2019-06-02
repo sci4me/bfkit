@@ -1,5 +1,6 @@
 use crate::parser::BrainfuckInstruction;
 
+/// Compiles a sequence of BrainfuckInstructions to C source code.
 pub fn compile(ir: Vec<BrainfuckInstruction>) -> String {
     let mut result = String::new();
 

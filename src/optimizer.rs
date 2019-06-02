@@ -3,7 +3,7 @@ use crate::parser::BrainfuckInstruction;
 /// Performs up to `max_passes` optimization passes on a sequence of BrainfuckInstructions.
 /// Will stop early, before `max_passes`, if no progress is being made.
 pub fn optimize(ir: Vec<BrainfuckInstruction>, max_passes: u32) -> Vec<BrainfuckInstruction> {
-    let opts: Vec<Optimization> = vec![contraction, clear_loop_removal, scan_loop_removal];
+    let opts: Vec<Optimization> = vec![dead_code_removal, contraction, clear_loop_removal, scan_loop_removal];
 
     let mut current = ir;
     let mut last_size = current.len();
@@ -28,6 +28,26 @@ pub fn optimize(ir: Vec<BrainfuckInstruction>, max_passes: u32) -> Vec<Brainfuck
 }
 
 type Optimization = fn(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction>;
+
+fn dead_code_removal(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction> {
+    if let BrainfuckInstruction::Open = ir[0] {
+        let mut index = 0;
+        let mut level = 1;
+
+        while level > 1 {
+            if let BrainfuckInstruction::Open = ir[index] {
+                level += 1;
+            } else if let BrainfuckInstruction::Close = ir[index] {
+                level -= 1;
+            }
+            index += 1;
+        }
+
+        ir[index..].to_vec()
+    } else {
+        ir
+    }
+}
 
 fn clear_loop_removal(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction> {
     fn match_clear(ir: &Vec<BrainfuckInstruction>, index: usize) -> bool {

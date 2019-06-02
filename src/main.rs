@@ -27,7 +27,7 @@ fn main() {
                 .takes_value(true)
                 .value_name("FILE")
                 .required(true)
-                .help("Brainfuck source file to be executed"),
+                .help("Brainfuck source file to be compiled or executed"),
         )
         .get_matches();
 

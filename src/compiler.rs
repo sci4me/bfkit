@@ -17,19 +17,19 @@ pub fn compile(ir: Vec<BrainfuckInstruction>) -> String {
             BrainfuckInstruction::Add(count) => {
                 indent(&mut result, level);
                 result.push_str(&format!("ADJUST(0, {})", count));
-            },
+            }
             BrainfuckInstruction::Sub(count) => {
                 indent(&mut result, level);
                 result.push_str(&format!("ADJUST(0, -{})", count));
-            },
+            }
             BrainfuckInstruction::Right(count) => {
                 indent(&mut result, level);
                 result.push_str(&format!("SELECT({})", count));
-            },
+            }
             BrainfuckInstruction::Left(count) => {
                 indent(&mut result, level);
                 result.push_str(&format!("SELECT(-{})", count));
-            },
+            }
             BrainfuckInstruction::Read => {
                 indent(&mut result, level);
                 result.push_str(&format!("READ(0)"));
@@ -42,24 +42,24 @@ pub fn compile(ir: Vec<BrainfuckInstruction>) -> String {
                 indent(&mut result, level);
                 result.push_str("OPEN()");
                 level += 1;
-            },
+            }
             BrainfuckInstruction::Close => {
                 level -= 1;
                 indent(&mut result, level);
                 result.push_str("CLOSE()");
-            },
+            }
             BrainfuckInstruction::Set(value) => {
                 indent(&mut result, level);
                 result.push_str(&format!("SET(0, {})", value))
-            },
+            }
             BrainfuckInstruction::ScanLeft => {
                 indent(&mut result, level);
                 result.push_str("SCAN_LEFT()")
-            },
+            }
             BrainfuckInstruction::ScanRight => {
                 indent(&mut result, level);
                 result.push_str("SCAN_RIGHT()")
-            },
+            }
         }
         result.push('\n');
         index += 1;

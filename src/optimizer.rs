@@ -3,11 +3,7 @@ use crate::parser::BrainfuckInstruction;
 /// Performs up to `max_passes` optimization passes on a sequence of BrainfuckInstructions.
 /// Will stop early, before `max_passes`, if no progress is being made.
 pub fn optimize(ir: Vec<BrainfuckInstruction>, max_passes: u32) -> Vec<BrainfuckInstruction> {
-    let opts: Vec<Optimization> = vec![
-        contraction,
-        clear_loop_removal,
-        scan_loop_removal
-    ];
+    let opts: Vec<Optimization> = vec![contraction, clear_loop_removal, scan_loop_removal];
 
     let mut current = ir;
     let mut last_size = current.len();
@@ -35,11 +31,17 @@ type Optimization = fn(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstructio
 
 fn clear_loop_removal(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction> {
     fn match_clear(ir: &Vec<BrainfuckInstruction>, index: usize) -> bool {
-        if index + 2 >= ir.len() { return false; }
+        if index + 2 >= ir.len() {
+            return false;
+        }
 
         match (&ir[index], &ir[index + 1], &ir[index + 2]) {
-            (BrainfuckInstruction::Open, BrainfuckInstruction::Sub(n), BrainfuckInstruction::Close) if *n == 1 => true,
-            _ => false
+            (
+                BrainfuckInstruction::Open,
+                BrainfuckInstruction::Sub(n),
+                BrainfuckInstruction::Close,
+            ) if *n == 1 => true,
+            _ => false,
         }
     }
 
@@ -95,21 +97,26 @@ macro_rules! generate_contraction {
     }
 }
 
-generate_contraction!(
-    Add,
-    Sub,
-    Right,
-    Left
-);
+generate_contraction!(Add, Sub, Right, Left);
 
 fn scan_loop_removal(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction> {
     fn match_scan_loop(ir: &Vec<BrainfuckInstruction>, index: usize) -> bool {
-        if index + 2 >= ir.len() { return false; }
+        if index + 2 >= ir.len() {
+            return false;
+        }
 
         match (&ir[index], &ir[index + 1], &ir[index + 2]) {
-            (BrainfuckInstruction::Open, BrainfuckInstruction::Left(n), BrainfuckInstruction::Close) if *n == 1 => true,
-            (BrainfuckInstruction::Open, BrainfuckInstruction::Right(n), BrainfuckInstruction::Close) if *n == 1 => true,
-            _ => false
+            (
+                BrainfuckInstruction::Open,
+                BrainfuckInstruction::Left(n),
+                BrainfuckInstruction::Close,
+            ) if *n == 1 => true,
+            (
+                BrainfuckInstruction::Open,
+                BrainfuckInstruction::Right(n),
+                BrainfuckInstruction::Close,
+            ) if *n == 1 => true,
+            _ => false,
         }
     }
 

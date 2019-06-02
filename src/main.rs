@@ -1,6 +1,6 @@
 use clap::{crate_authors, crate_description, crate_name, App, Arg};
-use rbc::optimizer;
-use rbc::{compiler, parser};
+use bfkit::optimizer;
+use bfkit::{compiler, parser};
 use std::fs;
 
 fn main() {

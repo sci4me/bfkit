@@ -69,7 +69,7 @@ fn repl() {
                 println!("    break (b)");
                 println!("    step (s)");
                 println!("    print (p)");
-                println!("    set (s)");
+                println!("    assign (a)");
             }
             "quit" | "q" => {
                 exit(0);
@@ -86,7 +86,7 @@ fn repl() {
             "print" | "p" => {
                 // TODO
             }
-            "set" | "s" => {
+            "assign" | "a" => {
                 // TODO
             }
             _ => {

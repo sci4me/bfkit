@@ -3,7 +3,8 @@ use crate::parser::BrainfuckInstruction;
 pub fn optimize(ir: Vec<BrainfuckInstruction>, max_passes: u32) -> Vec<BrainfuckInstruction> {
     let opts: Vec<Optimization> = vec![
         contraction,
-        clear_loop_removal
+        clear_loop_removal,
+        scan_loop_removal
     ];
 
     let mut current = ir;
@@ -98,3 +99,37 @@ generate_contraction!(
     Right,
     Left
 );
+
+fn scan_loop_removal(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction> {
+    fn match_scan_loop(ir: &Vec<BrainfuckInstruction>, index: usize) -> bool {
+        if index + 2 >= ir.len() { return false; }
+
+        match (&ir[index], &ir[index + 1], &ir[index + 2]) {
+            (BrainfuckInstruction::Open, BrainfuckInstruction::Left(n), BrainfuckInstruction::Close) if *n == 1 => true,
+            (BrainfuckInstruction::Open, BrainfuckInstruction::Right(n), BrainfuckInstruction::Close) if *n == 1 => true,
+            _ => false
+        }
+    }
+
+    let mut result = Vec::new();
+
+    let mut index = 0;
+    while index < ir.len() {
+        if match_scan_loop(&ir, index) {
+            if let BrainfuckInstruction::Left(_) = &ir[index + 1] {
+                result.push(BrainfuckInstruction::ScanLeft);
+            } else if let BrainfuckInstruction::Right(_) = &ir[index + 1] {
+                result.push(BrainfuckInstruction::ScanRight);
+            } else {
+                unreachable!();
+            }
+
+            index += 3;
+        } else {
+            result.push(ir[index].clone());
+            index += 1;
+        }
+    }
+
+    result
+}

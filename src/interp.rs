@@ -5,6 +5,7 @@ use std::collections::{HashMap, HashSet};
 use std::io::{stdin, stdout, Read, Write};
 
 /// StopReason represents a reason the Interpreter might stop running.
+#[derive(Debug, PartialEq)]
 pub enum StopReason {
     /// Breakpoint means that the Interpreter tried to execute an instruction that has a breakpoint set on it.
     Breakpoint(usize),
@@ -87,10 +88,10 @@ impl Interpreter {
     /// Runs the Interpreter until either a breakpoint is hit or until the program has run to completion.
     pub fn run(&mut self) -> StopReason {
         while self.instruction_pointer < self.code.len() {
+            self.step();
+
             if self.breakpoints.contains(&self.instruction_pointer) {
                 return StopReason::Breakpoint(self.instruction_pointer);
-            } else {
-                self.step();
             }
         }
         StopReason::Done
@@ -199,5 +200,147 @@ impl Interpreter {
             self.data_pointer = address;
             Ok(())
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parser;
+
+    #[test]
+    fn set_breakpoint_works() {
+        let code = parser::parse_str(String::from("++[>++<-]"));
+        let mut subject = Interpreter::new(code);
+
+        subject.set_breakpoint(3);
+
+        assert!(subject.breakpoints.contains(&3))
+    }
+
+    #[test]
+    fn delete_breakpoint_works() {
+        let code = parser::parse_str(String::from("++[>++<-]"));
+        let mut subject = Interpreter::new(code);
+        subject.breakpoints.insert(3);
+
+        subject.delete_breakpoint(3);
+
+        assert!(!subject.breakpoints.contains(&3));
+    }
+
+    #[test]
+    fn run_works() {
+        let code = parser::parse_str(String::from("++[>++<-]"));
+        let mut subject = Interpreter::new(code);
+
+        assert_eq!(subject.run(), StopReason::Done);
+
+        assert_eq!(subject.tape[0], 0);
+        assert_eq!(subject.tape[1], 4);
+        assert_eq!(subject.instruction_pointer, 9);
+        assert_eq!(subject.data_pointer, 0);
+    }
+
+    #[test]
+    fn run_stops_for_breakpoints() {
+        let code = parser::parse_str(String::from("++[>++<-]"));
+        let mut subject = Interpreter::new(code);
+
+        subject.set_breakpoint(1);
+
+        assert_eq!(subject.run(), StopReason::Breakpoint(1));
+        assert_eq!(subject.run(), StopReason::Done);
+
+        assert_eq!(subject.tape[0], 0);
+        assert_eq!(subject.tape[1], 4);
+        assert_eq!(subject.instruction_pointer, 9);
+        assert_eq!(subject.data_pointer, 0);
+    }
+
+    #[test]
+    fn step_works() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        assert_eq!(subject.tape[0], 0);
+        subject.step();
+        assert_eq!(subject.tape[0], 1);
+        subject.step();
+        assert_eq!(subject.tape[0], 2);
+        subject.step();
+        assert_eq!(subject.tape[0], 3);
+    }
+
+    #[test]
+    fn get_works() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        subject.tape[42] = 42;
+
+        assert_eq!(subject.get(42), Ok(42));
+    }
+
+    #[test]
+    fn get_returns_error_when_address_out_of_bounds() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        assert_eq!(subject.get(100000000), Err(String::from("Address out of bounds: 100000000")));
+    }
+
+    #[test]
+    fn set_works() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        subject.tape[42] = 12;
+
+        assert_eq!(subject.set(42, 42), Ok(12));
+    }
+
+    #[test]
+    fn set_returns_error_when_address_out_of_bounds() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        assert_eq!(subject.set(100000000, 42), Err(String::from("Address out of bounds: 100000000")));
+    }
+
+    #[test]
+    fn jump_works() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        assert_eq!(subject.jump(2), Ok(()));
+        assert_eq!(subject.instruction_pointer, 2);
+    }
+
+    #[test]
+    fn jump_returns_error_when_address_out_of_bounds() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        assert_eq!(subject.jump(100000000), Err(String::from("Address out of bounds: 100000000")));
+        assert_eq!(subject.instruction_pointer, 0);
+    }
+
+    #[test]
+    fn select_works() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        assert_eq!(subject.select(2), Ok(()));
+        assert_eq!(subject.data_pointer, 2);
+    }
+
+    #[test]
+    fn select_returns_error_when_address_out_of_bounds() {
+        let code = parser::parse_str(String::from("+++"));
+        let mut subject = Interpreter::new(code);
+
+        assert_eq!(subject.select(100000000), Err(String::from("Address out of bounds: 100000000")));
+        assert_eq!(subject.data_pointer, 0);
     }
 }

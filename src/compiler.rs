@@ -70,3 +70,46 @@ pub fn compile(ir: Vec<BrainfuckInstruction>) -> String {
         .replace("__TAPE_SIZE__", "30000")
         .replace("__CODE__", &result.trim())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::optimizer;
+    use crate::parser;
+
+    #[test]
+    fn compile_works() {
+        let input = optimizer::optimize(
+            parser::parse_str(String::from("+++[>+++<-],.[>][<][-]")),
+            10,
+        );
+
+        let result = compile(input);
+
+        let start = result.find("u8 *dp = tape;\n").unwrap() + 16;
+        let end = result.find("__free(tape, tape_size);\n").unwrap() - 6;
+        let substring = &result[start..end];
+        println!("{}", substring);
+
+        let mut expected = String::new();
+        for x in vec![
+            "ADJUST(0, 3)",
+            "OPEN()",
+            "    SELECT(1)",
+            "    ADJUST(0, 3)",
+            "    SELECT(-1)",
+            "    ADJUST(0, -1)",
+            "CLOSE()",
+            "READ(0)",
+            "WRITE(0)",
+            "SCAN_RIGHT()",
+            "SCAN_LEFT()",
+            "SET(0, 0)",
+        ] {
+            expected.push_str(x);
+            expected.push_str("\n    ");
+        }
+
+        assert_eq!(substring.trim(), expected.trim_end());
+    }
+}

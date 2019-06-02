@@ -3,6 +3,8 @@ name = "rbc"
 version = "0.1.0"
 authors = ["Scitoshi Nakayobro <matthewtpeterson1@gmail.com>"]
 edition = "2018"
+description = "An optimizing Brainfuck to C compiler"
+license = "MIT"
 
 [[bin]]
 name = "rbc"

@@ -2,6 +2,7 @@ use crate::parser::BrainfuckInstruction;
 
 pub fn optimize(ir: Vec<BrainfuckInstruction>, max_passes: u32) -> Vec<BrainfuckInstruction> {
     let opts: Vec<Optimization> = vec![
+        contraction,
         clear_loop_removal
     ];
 
@@ -54,3 +55,46 @@ fn clear_loop_removal(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction
 
     result
 }
+
+macro_rules! generate_contraction {
+    ( $( $name:ident ),* ) => {
+        fn contraction(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction> {
+            let mut result = Vec::new();
+
+            let mut index = 0;
+            while index < ir.len() {
+                match &ir[index] {
+                    $(
+                        BrainfuckInstruction::$name(n) => {
+                            let mut count = *n;
+                            while index + 1 < ir.len() {
+                                if let BrainfuckInstruction::$name(x) = &ir[index + 1] {
+                                    count = count.wrapping_add(*x);
+                                    index += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+
+                            result.push(BrainfuckInstruction::$name(count));
+                            index += 1;
+                        }
+                    )*,
+                    _ => {
+                        result.push(ir[index].clone());
+                        index += 1;
+                    }
+                }
+            }
+
+            result
+        }
+    }
+}
+
+generate_contraction!(
+    Add,
+    Sub,
+    Right,
+    Left
+);

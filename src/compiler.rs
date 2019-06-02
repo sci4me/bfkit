@@ -29,17 +29,13 @@ pub fn compile(ir: Vec<BrainfuckInstruction>) -> String {
                 indent(&mut result, level);
                 result.push_str(&format!("SELECT(-{})", count));
             },
-            BrainfuckInstruction::Read(count) => {
-                for _ in 0..*count {
-                    indent(&mut result, level);
-                    result.push_str(&format!("READ(0)"));
-                }
+            BrainfuckInstruction::Read => {
+                indent(&mut result, level);
+                result.push_str(&format!("READ(0)"));
             }
-            BrainfuckInstruction::Write(count) => {
-                for _ in 0..*count {
-                    indent(&mut result, level);
-                    result.push_str(&format!("WRITE(0)"));
-                }
+            BrainfuckInstruction::Write => {
+                indent(&mut result, level);
+                result.push_str(&format!("WRITE(0)"));
             }
             BrainfuckInstruction::Open => {
                 indent(&mut result, level);

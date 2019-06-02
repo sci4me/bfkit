@@ -2,11 +2,15 @@ use crate::parser::BrainfuckInstruction;
 use std::collections::{HashMap, HashSet};
 use std::io::{stdin, stdout, Read, Write};
 
+/// StopReason represents a reason the Interpreter might stop running.
 pub enum StopReason {
+    /// Breakpoint means that the Interpreter tried to execute an instruction that has a breakpoint set on it.
     Breakpoint(usize),
+    /// Done means that the Interpreter finished executing the Brainfuck program.
     Done,
 }
 
+/// A Brainfuck interpreter that supports breakpoints.
 pub struct Interpreter {
     code: Vec<BrainfuckInstruction>,
     tape: Vec<u8>,
@@ -17,6 +21,11 @@ pub struct Interpreter {
 }
 
 impl Interpreter {
+    /// Creates a new Interpreter form some input program.
+    ///
+    /// # Arguments
+    ///
+    /// * `code` - A sequence of BrainfuckInstructions to be interpreted.
     pub fn new(code: Vec<BrainfuckInstruction>) -> Self {
         let mut result = Self {
             code,
@@ -51,6 +60,11 @@ impl Interpreter {
         }
     }
 
+    /// Sets a breakpoint at the specified code address.
+    ///
+    /// # Arguments
+    ///
+    /// * `address` - The code address to set a breakpoint at.
     pub fn set_breakpoint(&mut self, address: usize) -> Result<bool, String> {
         if address >= self.code.len() {
             Err(format!("Address out of bounds: {}", address))
@@ -59,10 +73,16 @@ impl Interpreter {
         }
     }
 
+    /// Removes a breakpoint at the specified code address.
+    ///
+    /// # Arguments
+    ///
+    /// * `address` - The code address to delete a breakpoint from.
     pub fn delete_breakpoint(&mut self, address: usize) -> bool {
         self.breakpoints.remove(&address)
     }
 
+    /// Runs the Interpreter until either a breakpoint is hit or until the program has run to completion.
     pub fn run(&mut self) -> StopReason {
         while self.instruction_pointer < self.code.len() {
             if self.breakpoints.contains(&self.instruction_pointer) {
@@ -74,6 +94,7 @@ impl Interpreter {
         StopReason::Done
     }
 
+    /// Executes a single BrainfuckInstruction.
     pub fn step(&mut self) {
         let mut next_instruction_pointer = self.instruction_pointer + 1;
 
@@ -121,6 +142,11 @@ impl Interpreter {
         self.instruction_pointer = next_instruction_pointer;
     }
 
+    /// Reads a value from the tape at the specified address.
+    ///
+    /// # Arguments
+    ///
+    /// * `address` - The tape address to read.
     pub fn get(&self, address: usize) -> Result<u8, String> {
         if address >= self.tape.len() {
             Err(format!("Address out of bounds: {}", address))
@@ -129,6 +155,12 @@ impl Interpreter {
         }
     }
 
+    /// Writes a value to the tape at the specified address.
+    ///
+    /// # Arguments
+    ///
+    /// * `address` - The tape address to write to.
+    /// * `value` - The value to write.
     pub fn set(&mut self, address: usize, value: u8) -> Result<u8, String> {
         if address >= self.tape.len() {
             Err(format!("Address out of bounds: {}", address))
@@ -139,6 +171,11 @@ impl Interpreter {
         }
     }
 
+    /// Sets the instruction pointer to the specified code address.
+    ///
+    /// # Arguments
+    ///
+    /// * `address` - The code address to jump to.
     pub fn jump(&mut self, address: usize) -> Result<(), String> {
         if address >= self.code.len() {
             Err(format!("Address out of bounds: {}", address))
@@ -148,6 +185,11 @@ impl Interpreter {
         }
     }
 
+    /// Sets the data pointer to the specified tape address.
+    ///
+    /// # Arguments
+    ///
+    /// * `address` - The tape address to set the data pointer to.
     pub fn select(&mut self, address: usize) -> Result<(), String> {
         if address >= self.tape.len() {
             Err(format!("Address out of bounds: {}", address))

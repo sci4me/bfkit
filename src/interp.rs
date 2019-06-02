@@ -1,6 +1,6 @@
 use crate::parser::BrainfuckInstruction;
-use std::collections::{HashSet, HashMap};
-use std::io::{stdin, Read, stdout, Write};
+use std::collections::{HashMap, HashSet};
+use std::io::{stdin, stdout, Read, Write};
 
 pub enum StopReason {
     Breakpoint(usize),
@@ -78,11 +78,17 @@ impl Interpreter {
         let mut next_instruction_pointer = self.instruction_pointer + 1;
 
         match self.code[self.instruction_pointer] {
-            BrainfuckInstruction::Add(count) => self.tape[self.data_pointer] = self.tape[self.data_pointer].wrapping_add(count),
-            BrainfuckInstruction::Sub(count) => self.tape[self.data_pointer] = self.tape[self.data_pointer].wrapping_sub(count),
+            BrainfuckInstruction::Add(count) => {
+                self.tape[self.data_pointer] = self.tape[self.data_pointer].wrapping_add(count)
+            }
+            BrainfuckInstruction::Sub(count) => {
+                self.tape[self.data_pointer] = self.tape[self.data_pointer].wrapping_sub(count)
+            }
             BrainfuckInstruction::Right(count) => self.data_pointer += count,
             BrainfuckInstruction::Left(count) => self.data_pointer -= count,
-            BrainfuckInstruction::Read => self.tape[self.data_pointer] = stdin().bytes().take(1).last().unwrap().unwrap(),
+            BrainfuckInstruction::Read => {
+                self.tape[self.data_pointer] = stdin().bytes().take(1).last().unwrap().unwrap()
+            }
             BrainfuckInstruction::Write => {
                 print!("{}", self.tape[self.data_pointer] as char);
                 stdout().flush().unwrap();

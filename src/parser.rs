@@ -38,12 +38,20 @@ pub enum BrainfuckInstruction {
 
 /// Parses a sequence of BrainfuckInstructions from a string.
 /// Ignores all non-Brainfuck characters.
+///
+/// # Arguments
+///
+/// * `code` - The Brainfuck source code to parse.
 pub fn parse_str(code: String) -> Vec<BrainfuckInstruction> {
     parse(&code.chars().collect::<Vec<char>>())
 }
 
 /// Parses a sequence of BrainfuckInstructions from a slice of characters.
 /// Ignores all non-Brainfuck characters.
+///
+/// # Arguments
+///
+/// * `code` - The Brainfuck source code to parse.
 pub fn parse(code: &[char]) -> Vec<BrainfuckInstruction> {
     let mut result = Vec::new();
 

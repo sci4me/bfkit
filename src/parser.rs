@@ -78,6 +78,7 @@ mod tests {
         let result = parse_str(code.to_string());
 
         assert_eq!(
+            result,
             vec![
                 BrainfuckInstruction::Add(1),
                 BrainfuckInstruction::Add(1),
@@ -94,8 +95,7 @@ mod tests {
                 BrainfuckInstruction::Open,
                 BrainfuckInstruction::Sub(1),
                 BrainfuckInstruction::Close
-            ],
-            result
+            ]
         );
     }
 
@@ -106,6 +106,7 @@ mod tests {
         let result = parse(&code.chars().collect::<Vec<char>>());
 
         assert_eq!(
+            result,
             vec![
                 BrainfuckInstruction::Add(1),
                 BrainfuckInstruction::Add(1),
@@ -122,8 +123,7 @@ mod tests {
                 BrainfuckInstruction::Open,
                 BrainfuckInstruction::Sub(1),
                 BrainfuckInstruction::Close
-            ],
-            result
+            ]
         );
     }
 }

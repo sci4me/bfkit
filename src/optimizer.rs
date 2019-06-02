@@ -3,7 +3,12 @@ use crate::parser::BrainfuckInstruction;
 /// Performs up to `max_passes` optimization passes on a sequence of BrainfuckInstructions.
 /// Will stop early, before `max_passes`, if no progress is being made.
 pub fn optimize(ir: Vec<BrainfuckInstruction>, max_passes: u32) -> Vec<BrainfuckInstruction> {
-    let opts: Vec<Optimization> = vec![dead_code_removal, contraction, clear_loop_removal, scan_loop_removal];
+    let opts: Vec<Optimization> = vec![
+        dead_code_removal,
+        contraction,
+        clear_loop_removal,
+        scan_loop_removal,
+    ];
 
     let mut current = ir;
     let mut last_size = current.len();
@@ -31,10 +36,10 @@ type Optimization = fn(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstructio
 
 fn dead_code_removal(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction> {
     if let BrainfuckInstruction::Open = ir[0] {
-        let mut index = 0;
+        let mut index = 1;
         let mut level = 1;
 
-        while level > 1 {
+        while index < ir.len() && level > 0 {
             if let BrainfuckInstruction::Open = ir[index] {
                 level += 1;
             } else if let BrainfuckInstruction::Close = ir[index] {
@@ -161,4 +166,94 @@ fn scan_loop_removal(ir: Vec<BrainfuckInstruction>) -> Vec<BrainfuckInstruction>
     }
 
     result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parser::parse_str;
+
+    #[test]
+    fn optimize_works() {
+        let input = parse_str(String::from("[lol]+++[>+++<-][-][>]+[<]"));
+        let len = input.len();
+
+        let result = optimize(input, 10);
+
+        assert_eq!(
+            result,
+            vec![
+                BrainfuckInstruction::Add(3),
+                BrainfuckInstruction::Open,
+                BrainfuckInstruction::Right(1),
+                BrainfuckInstruction::Add(3),
+                BrainfuckInstruction::Left(1),
+                BrainfuckInstruction::Sub(1),
+                BrainfuckInstruction::Close,
+                BrainfuckInstruction::Set(0),
+                BrainfuckInstruction::ScanRight,
+                BrainfuckInstruction::Add(1),
+                BrainfuckInstruction::ScanLeft
+            ]
+        );
+        assert!(result.len() < len);
+    }
+
+    #[test]
+    fn dead_code_removal_works() {
+        let input = parse_str(String::from("[++[>+<-]]++-"));
+        let len = input.len();
+
+        let result = dead_code_removal(input);
+
+        assert_eq!(result, parse_str(String::from("++-")));
+        assert!(result.len() < len);
+    }
+
+    #[test]
+    fn clear_loop_removal_works() {
+        let input = parse_str(String::from("[-]"));
+        let len = input.len();
+
+        let result = clear_loop_removal(input);
+
+        assert_eq!(result, vec![BrainfuckInstruction::Set(0)]);
+        assert!(result.len() < len);
+    }
+
+    #[test]
+    fn contraction_works() {
+        let input = parse_str(String::from("++--->>>><<<<<"));
+        let len = input.len();
+
+        let result = contraction(input);
+
+        assert_eq!(
+            result,
+            vec![
+                BrainfuckInstruction::Add(2),
+                BrainfuckInstruction::Sub(3),
+                BrainfuckInstruction::Right(4),
+                BrainfuckInstruction::Left(5)
+            ]
+        );
+        assert!(result.len() < len);
+    }
+
+    #[test]
+    fn scan_loop_removal_works() {
+        let input = parse_str(String::from("[>][<]"));
+        let len = input.len();
+
+        let result = scan_loop_removal(input);
+
+        assert_eq!(
+            result,
+            vec![
+                BrainfuckInstruction::ScanRight,
+                BrainfuckInstruction::ScanLeft
+            ]
+        );
+        assert!(result.len() < len);
+    }
 }

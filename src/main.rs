@@ -25,7 +25,7 @@ fn main() {
     let compiled = compiler::compile(code);
 
     if let Some(output) = matches.value_of("output") {
-        fs::write(output, compiled);
+        fs::write(output, compiled).unwrap();
     } else {
         println!("{}", compiled);
     }

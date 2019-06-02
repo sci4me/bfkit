@@ -1,7 +1,7 @@
 # rbc
 [![Current Crates.io Version](https://img.shields.io/crates/v/rbc.svg)](https://crates.io/crates/rbc)
 [![Documentation](https://docs.rs/rbc/badge.svg)](https://docs.rs/rbc/)
-[![lines of code](https://tokei.rs/b1/github/sci4me/rbc)](https://github.com/Aaronepower/tokei)
+[![lines of code](https://tokei.rs/b1/github/sci4me/rbc)](https://github.com/sci4me/rbc)
 [![](https://img.shields.io/crates/d/rbc.svg)](https://crates.io/crates/rbc)
 [![](https://img.shields.io/github/issues-raw/sci4me/rbc.svg)](https://github.com/sci4me/rbc/issues)
 [![Build Status](https://travis-ci.org/sci4me/rbc.svg?branch=master)](https://travis-ci.org/sci4me/rbc)

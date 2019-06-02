@@ -4,5 +4,9 @@ version = "0.1.0"
 authors = ["Scitoshi Nakayobro <matthewtpeterson1@gmail.com>"]
 edition = "2018"
 
+[[bin]]
+name = "rbc"
+path = "src/main.rs"
+
 [dependencies]
 clap = "2.33.0"

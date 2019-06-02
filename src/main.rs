@@ -75,6 +75,8 @@ fn repl(source: String) {
                 println!("    step (s)");
                 println!("    print (p)");
                 println!("    assign (a)");
+                println!("    jump (j)");
+                println!("    select");
             }
             "quit" | "q" => {
                 println!("OK");
@@ -114,7 +116,7 @@ fn repl(source: String) {
             },
             "step" | "s" => {
                 interp.step();
-            }
+            },
             "print" | "p" => {
                 if parts.len() != 2 {
                     eprintln!("Invalid syntax!");
@@ -127,7 +129,7 @@ fn repl(source: String) {
                         Err(_) => eprintln!("Invalid address: {}", parts[1])
                     }
                 }
-            }
+            },
             "assign" | "a" => {
                 if parts.len() != 3 {
                     eprintln!("Invalid syntax!");
@@ -143,7 +145,33 @@ fn repl(source: String) {
                         Err(_) => eprintln!("Invalid address: {}", parts[1])
                     }
                 }
-            }
+            },
+            "jump" | "j" => {
+                if parts.len() != 2 {
+                    eprintln!("Invalid syntax!");
+                } else {
+                    match parts[1].parse::<usize>() {
+                        Ok(address) => match interp.jump(address) {
+                            Ok(_) => println!("OK"),
+                            Err(e) => eprintln!("{}", e)
+                        },
+                        Err(_) => eprintln!("Invalid address: {}", parts[1])
+                    }
+                }
+            },
+            "select" => {
+                if parts.len() != 2 {
+                    eprintln!("Invalid syntax!");
+                } else {
+                    match parts[1].parse::<usize>() {
+                        Ok(address) => match interp.select(address) {
+                            Ok(_) => println!("OK"),
+                            Err(e) => eprintln!("{}", e)
+                        },
+                        Err(_) => eprintln!("Invalid address: {}", parts[1])
+                    }
+                }
+            },
             _ => {
                 eprintln!("Unrecognized command: {}", buffer);
             }

@@ -1,3 +1,5 @@
+//! A parser from Brainfuck source code to sequences of BrainfuckInstructions.
+
 /// Represents any of the eight standard Brainfuck instructions:
 ///
 /// * `+`

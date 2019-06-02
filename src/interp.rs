@@ -1,3 +1,5 @@
+//! A Brainfuck interpreter that supports breakpoints.
+
 use crate::parser::BrainfuckInstruction;
 use std::collections::{HashMap, HashSet};
 use std::io::{stdin, stdout, Read, Write};

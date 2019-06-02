@@ -5,6 +5,7 @@ use crate::{compiler, parser, optimizer};
 use crate::interp::{Interpreter, StopReason};
 use std::process::exit;
 
+/// Runs the brkit interactive Read-Evaluate-Print-Loop, including a gdb-style debugger.
 pub fn repl(source: String) {
     let code = parser::parse_str(source);
     let mut interp = Interpreter::new(code.clone());

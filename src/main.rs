@@ -7,6 +7,11 @@ fn main() {
     let matches = App::new(crate_name!())
         .about(crate_description!())
         .author(crate_authors!())
+        .arg(Arg::with_name("output")
+            .short("o")
+            .takes_value(true)
+            .value_name("OUTPUT")
+            .help("The C source file to be written"))
         .arg(Arg::with_name("file")
             .takes_value(true)
             .value_name("FILE")
@@ -17,5 +22,11 @@ fn main() {
     let source = fs::read_to_string(matches.value_of("file").unwrap()).unwrap();
     let code = optimizer::optimize(parser::parse_str(source), 10);
 
-    println!("{}", compiler::compile(code));
+    let compiled = compiler::compile(code);
+
+    if let Some(output) = matches.value_of("output") {
+        fs::write(output, compiled);
+    } else {
+        println!("{}", compiled);
+    }
 }

@@ -91,7 +91,7 @@ pub fn ir_to_string(ir: Vec<BrainfuckInstruction>) -> String {
             },
             BrainfuckInstruction::Set(value) => {
                 indent(&mut result, level);
-                result.push_str(&format!("set {}", value))
+                result.push_str(&format!("set {}\n", value))
             },
             BrainfuckInstruction::ScanRight => {
                 indent(&mut result, level);
@@ -105,4 +105,38 @@ pub fn ir_to_string(ir: Vec<BrainfuckInstruction>) -> String {
     }
 
     result
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parser;
+    use crate::optimizer;
+
+    #[test]
+    fn ir_to_string_works() {
+        let code = optimizer::optimize(parser::parse_str(String::from("++-[-],.[>++<-][<][>]")), 10);
+
+        let result = ir_to_string(code);
+
+        let expected = vec![
+            "add 2",
+            "sub 1",
+            "set 0",
+            "read",
+            "write",
+            "open",
+            "    right 1",
+            "    add 2",
+            "    left 1",
+            "    sub 1",
+            "close",
+            "scan_left",
+            "scan_right",
+        ]
+            .iter()
+            .fold(String::new(), |a, b| format!("{}\n{}", a, b));
+
+        assert_eq!(result.trim(), expected.trim());
+    }
 }

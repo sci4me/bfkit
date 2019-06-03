@@ -1,6 +1,6 @@
 //! A compiler from sequences of BrainfuckInstructions to C source code.
 
-use crate::parser::BrainfuckInstruction;
+use crate::ir::BrainfuckInstruction;
 
 /// Compiles a sequence of BrainfuckInstructions to C source code.
 ///

@@ -1,6 +1,6 @@
 //! An optimizer for sequences of BrainfuckInstructions.
 
-use crate::parser::BrainfuckInstruction;
+use crate::ir::BrainfuckInstruction;
 
 /// Performs up to `max_passes` optimization passes on a sequence of BrainfuckInstructions.
 /// Will stop early, before `max_passes`, if no progress is being made.

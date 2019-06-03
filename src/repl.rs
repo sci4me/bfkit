@@ -1,7 +1,7 @@
 //! The interactive shell for bfkit.
 
 use std::io::{stdin, stdout, Write};
-use crate::{compiler, parser, optimizer};
+use crate::parser;
 use crate::interp::{Interpreter, StopReason};
 use std::process::exit;
 

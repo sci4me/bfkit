@@ -1,6 +1,6 @@
 //! A Brainfuck interpreter that supports breakpoints.
 
-use crate::parser::BrainfuckInstruction;
+use crate::ir::BrainfuckInstruction;
 use std::collections::{HashMap, HashSet};
 use std::io::{stdin, stdout, Read, Write};
 
@@ -285,7 +285,7 @@ mod tests {
     #[test]
     fn get_returns_error_when_address_out_of_bounds() {
         let code = parser::parse_str(String::from("+++"));
-        let mut subject = Interpreter::new(code);
+        let subject = Interpreter::new(code);
 
         assert_eq!(subject.get(100000000), Err(String::from("Address out of bounds: 100000000")));
     }

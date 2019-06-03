@@ -1,4 +1,4 @@
-use bfkit::{compiler, parser, optimizer, repl};
+use bfkit::{compiler, parser, optimizer, repl, ir};
 use clap::{crate_authors, crate_description, crate_name, App, Arg};
 use std::fs;
 
@@ -12,11 +12,19 @@ fn main() {
                 .help("Run an interactive REPL"),
         )
         .arg(
+            Arg::with_name("output-type")
+                .short("t")
+                .help("The output format [c, ir]")
+                .takes_value(true)
+                .possible_values(&["c", "ir"])
+                .default_value("c")
+        )
+        .arg(
             Arg::with_name("output")
                 .short("o")
                 .takes_value(true)
                 .value_name("OUTPUT")
-                .help("The C source file to be written"),
+                .help("The output file to be written"),
         )
         .arg(
             Arg::with_name("file")
@@ -34,12 +42,26 @@ fn main() {
     } else {
         let code = optimizer::optimize(parser::parse_str(source), 10);
 
-        let compiled = compiler::compile(code);
+        match matches.value_of("output-type").unwrap() {
+            "c" => {
+                let compiled = compiler::compile(code);
 
-        if let Some(output) = matches.value_of("output") {
-            fs::write(output, compiled).unwrap();
-        } else {
-            println!("{}", compiled);
+                if let Some(output) = matches.value_of("output") {
+                    fs::write(output, compiled).unwrap();
+                } else {
+                    println!("{}", compiled);
+                }
+            },
+            "ir" => {
+                let ir = ir::ir_to_string(code);
+
+                if let Some(output) = matches.value_of("output") {
+                    fs::write(output, ir).unwrap();
+                } else {
+                    println!("{}", ir);
+                }
+            },
+            _ => unreachable!()
         }
     }
 }

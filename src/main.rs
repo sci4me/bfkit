@@ -42,26 +42,16 @@ fn main() {
     } else {
         let code = optimizer::optimize(parser::parse_str(source), 10);
 
-        match matches.value_of("output-type").unwrap() {
-            "c" => {
-                let compiled = compiler::compile(code);
-
-                if let Some(output) = matches.value_of("output") {
-                    fs::write(output, compiled).unwrap();
-                } else {
-                    println!("{}", compiled);
-                }
-            },
-            "ir" => {
-                let ir = ir::ir_to_string(code);
-
-                if let Some(output) = matches.value_of("output") {
-                    fs::write(output, ir).unwrap();
-                } else {
-                    println!("{}", ir);
-                }
-            },
+        let result = match matches.value_of("output-type").unwrap() {
+            "c" => compiler::compile(code),
+            "ir" => ir::ir_to_string(code),
             _ => unreachable!()
+        };
+
+        if let Some(output) = matches.value_of("output") {
+            fs::write(output, result).unwrap();
+        } else {
+            println!("{}", result);
         }
     }
 }
